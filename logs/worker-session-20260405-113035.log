@@ -349,3 +349,136 @@ Index: /home/julien/Desktop/Free-Wiggum-opencode/projects/splunkagent/TASKS.md
  ## Phase 2: Core Infrastructure
 
 [0m
+[0m# [0mTodos
+[x] Create architecture diagram (component diagram) and stack decision document
+[x] Research Splunk MCP specifications and REST API endpoints
+[0m
+Update the todo list and commit:
+[0m$ [0mgit add . && git commit -m "docs: add architecture diagram and technology stack decisions" && git push origin main
+[main 5e3cc1b] docs: add architecture diagram and technology stack decisions
+ 5 files changed, 969 insertions(+), 1 deletion(-)
+ create mode 100644 diagrams/component-diagram.mmd
+ create mode 100644 docs/architecture-stack-decision.md
+To https://github.com/Julien-ser/splunkagent.git
+   35eaf6e..5e3cc1b  main -> main
+[0m
+Excellent! Task 1.2 completed. Now moving to **Task 1.3**: Initialize project repository with proper structure - create src/splunkagent/, tests/, setup .gitignore, pyproject.toml, and development environment.
+
+Let me check current state:
+[0m$ [0mls -la
+total 88
+drwxr-xr-x  7 julien julien 4096 Apr  5 11:33 .
+drwxr-xr-x 34 julien julien 4096 Apr  5 11:30 ..
+-rw-r--r--  1 julien julien    8 Apr  5 11:30 .agent_role
+-rw-r--r--  1 julien julien  214 Apr  5 11:30 configuration.toml
+drwxr-xr-x  2 julien julien 4096 Apr  5 11:33 diagrams
+drwxr-xr-x  2 julien julien 4096 Apr  5 11:34 docs
+drwxr-xr-x  7 julien julien 4096 Apr  5 11:34 .git
+drwxr-xr-x  3 julien julien 4096 Apr  5 11:30 .github
+-rw-r--r--  1 julien julien    4 Apr  5 11:30 .gitignore
+drwxr-xr-x  2 julien julien 4096 Apr  5 11:30 logs
+-rw-r--r--  1 julien julien 9218 Apr  5 11:30 prompt.txt
+-rw-r--r--  1 julien julien 4666 Apr  5 11:31 README.md
+-rw-r--r--  1 julien julien 6958 Apr  5 11:31 REQUIREMENTS_MATRIX.md
+-rw-r--r--  1 julien julien 5582 Apr  5 11:34 TASKS.md
+-rw-r--r--  1 julien julien 5582 Apr  5 11:30 TASKS_original.md
+-rw-r--r--  1 julien julien    6 Apr  5 11:30 .worker_persistent_mode
+[0m
+[0m# [0mTodos
+[ ] Initialize project repository structure: src/, tests/, docs/, diagrams/
+[x] Create architecture diagram and stack decision document
+[x] Research Splunk MCP specifications and REST API endpoints
+[0m
+Let me update the task tracking and start Task 1.3:
+Now let me create the project structure. I'll start by creating the directory structure:
+[0m$ [0mmkdir -p src/splunkagent/tools tests
+Now create __init__.py files and update .gitignore:
+[0m
+[0m← [0mWrite src/splunkagent/__init__.py
+Wrote file successfully.
+[0m
+[0m← [0mWrite src/splunkagent/tools/__init__.py
+Wrote file successfully.
+[0m
+[0m← [0mWrite tests/__init__.py
+Wrote file successfully.
+[0m
+Now update .gitignore with comprehensive Python ignores:
+[0m→ [0mRead .gitignore
+[0m
+[0m← [0mEdit .gitignore
+Index: /home/julien/Desktop/Free-Wiggum-opencode/projects/splunkagent/.gitignore
+===================================================================
+--- /home/julien/Desktop/Free-Wiggum-opencode/projects/splunkagent/.gitignore
++++ /home/julien/Desktop/Free-Wiggum-opencode/projects/splunkagent/.gitignore
+@@ -1,1 +1,61 @@
+-.env
+\ No newline at end of file
++# Python
++__pycache__/
++*.py[cod]
++*$py.class
++*.so
++.Python
++env/
++venv/
++.venv/
++ENV/
++build/
++develop-eggs/
++dist/
++downloads/
++eggs/
++.eggs/
++lib/
++lib64/
++parts/
++sdist/
++var/
++wheels/
++*.egg-info/
++.installed.cfg
++*.egg
++
++# Testing
++.pytest_cache/
++.coverage
++.coverage.*
++htmlcov/
++nosetests.xml
++tox.ini
++.hypothesis/
++
++# IDEs
++.vscode/
++.idea/
++*.swp
++*.swo
++*~
++
++# OS
++.DS_Store
++Thumbs.db
++
++# Logs
++logs/
++*.log
++
++# Secrets
++.env
++.env.local
++.secrets/
++
++# Configuration that may contain secrets
++configuration.toml
++
++# Temporary files
++tmp/
++temp/
+\ No newline at end of file
+
+[0m
+Now create pyproject.toml with project metadata and dependencies:
+[0m← [0mWrite pyproject.toml
+Wrote file successfully.
+[0m

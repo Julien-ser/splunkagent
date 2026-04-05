@@ -1,0 +1,125 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "splunkagent"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) server for Splunk integration"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Splunk Agent Team", email = "team@example.com"}
+]
+keywords = ["splunk", "mcp", "model-context-protocol", "ai", "search"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "mcp>=0.1.0",
+    "splunk-sdk>=1.7.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "structlog>=23.0.0",
+]
+
+[project.scripts]
+splunkagent = "splunkagent.server:main"
+
+[project.urls]
+Homepage = "https://github.com/anomalyco/splunkagent"
+Repository = "https://github.com/anomalyco/splunkagent.git"
+Documentation = "https://anomalyco.github.io/splunkagent"
+Issues = "https://github.com/anomalyco/splunkagent/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["splunkagent*"]
+
+[tool.setuptools.package-data]
+splunkagent = ["py.typed"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+select = ["E", "F", "W", "I", "UP", "N", "B", "A", "C", "Q"]
+ignore = []
+
+[tool.ruff.lint]
+mccabe = {max-complexity = 10}
+pydocstyle = {convention = "google"}
+
+[tool.pyright]
+venv = ".venv"
+reportMissingImports = true
+reportMissingTypeStubs = false
+strict = true
+pythonVersion = "3.11"
+pythonPlatform = "Linux"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.coverage.run]
+source = ["src/splunkagent"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "ruff>=0.1.0",
+    "pyright>=1.1.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
