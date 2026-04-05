@@ -1,0 +1,158 @@
+# Splunk MCP Agent - System Architecture
+
+## Component Diagram
+
+```mermaid
+graph TB
+    subgraph "External Systems"
+        MCP_CLIENT[MCP Client<br/>AI Assistant]
+        SPLUNK[Splunk Instance<br/>REST API]
+    end
+
+    subgraph "Splunk MCP Agent"
+        SERVER[FastMCP Server<br/>splunkagent.server]
+        
+        subgraph "Core Infrastructure"
+            AUTH[auth.py<br/>Authentication Handler]
+            CLIENT[client.py<br/>Splunk Client Wrapper]
+            CONFIG[config.py<br/>Configuration Manager]
+            LOGGING[logging.py<br/>Structured Logger]
+            EXCEPTIONS[exceptions.py<br/>Custom Errors]
+        end
+
+        subgraph "MCP Tools"
+            TOOL_QUERY[tools/query.py<br/>splunk_run_query]
+            TOOL_INFO[tools/info.py<br/>splunk_get_info]
+            TOOL_INDEXES[tools/indexes.py<br/>splunk_get_indexes/_info]
+            TOOL_METADATA[tools/metadata.py<br/>splunk_get_metadata<br/>splunk_get_knowledge_objects]
+            TOOL_USER[tools/user.py<br/>splunk_get_user_info]
+        end
+    end
+
+    %% Connections - MCP Layer
+    MCP_CLIENT -->|MCP Protocol| SERVER
+    SERVER -->|registers| TOOL_QUERY
+    SERVER -->|registers| TOOL_INFO
+    SERVER -->|registers| TOOL_INDEXES
+    SERVER -->|registers| TOOL_METADATA
+    SERVER -->|registers| TOOL_USER
+
+    %% Connections - Internal
+    TOOL_QUERY -->|uses| CLIENT
+    TOOL_INFO -->|uses| CLIENT
+    TOOL_INDEXES -->|uses| CLIENT
+    TOOL_METADATA -->|uses| CLIENT
+    TOOL_USER -->|uses| CLIENT
+
+    CLIENT -->|authenticates| AUTH
+    CLIENT -->|reads config| CONFIG
+    CLIENT -->|logs events| LOGGING
+    CLIENT -->|raises errors| EXCEPTIONS
+
+    %% External API
+    CLIENT -->|REST API calls| SPLUNK
+
+    %% Configuration dependency
+    CONFIG -->|loads| AUTH
+    AUTH -->|provides token| CLIENT
+
+    style SERVER fill:#e1f5ff
+    style AUTH fill:#f0f4c3
+    style CLIENT fill:#f0f4c3
+    style CONFIG fill:#f0f4c3
+    style SPLUNK fill:#ffebee
+    style MCP_CLIENT fill:#e8f5e8
+```
+
+## Component Descriptions
+
+### MCP Client (External)
+- **Role**: AI assistant or application using the Model Context Protocol
+- **Interface**: stdio or SSE transport
+- **Responsibilities**: Send tool invocation requests, receive results
+
+### FastMCP Server (splunkagent.server)
+- **Role**: Main MCP server entry point
+- **Responsibilities**:
+  - Initialize configuration and authentication
+  - Register all MCP tools with schemas
+  - Handle protocol communication
+  - Manage server lifecycle
+- **Interfaces**: MCP protocol (stdio/SSE)
+
+### Authentication Handler (auth.py)
+- **Role**: Manage Splunk authentication
+- **Responsibilities**:
+  - Support token-based and credential-based auth
+  - Secure token storage and refresh
+  - Credential validation
+- **Interfaces**: Called by client.py, uses CONFIG
+
+### Splunk Client Wrapper (client.py)
+- **Role**: Interface to Splunk REST API
+- **Responsibilities**:
+  - Connection pooling and management
+  - Exponential backoff retry logic
+  - Timeout handling
+  - Request orchestration
+- **Interfaces**: Used by all tool modules, calls Splunk REST API
+
+### Configuration Manager (config.py)
+- **Role**: Type-safe configuration management
+- **Responsibilities**:
+  - Load configuration from files/environment
+  - Validate with Pydantic schemas
+  - Provide config to all components
+- **Interfaces**: Used by all components
+
+### Structured Logger (logging.py)
+- **Role**: Centralized logging
+- **Responsibilities**:
+  - Configure structured logging with rotation
+  - Provide logger instances
+  - Handle log levels and destinations
+- **Interfaces**: Used by all components
+
+### Custom Exceptions (exceptions.py)
+- **Role**: Error hierarchy
+- **Responsibilities**:
+  - Define agent-specific exceptions
+  - Provide error categorization
+  - Support proper error handling
+- **Interfaces**: Raised by all components
+
+### MCP Tools (tools/*.py)
+- **Role**: Individual MCP function implementations
+- **Responsibilities**:
+  - Implement specific Splunk operations
+  - Validate input parameters
+  - Structure output for MCP response
+  - Handle tool-specific error cases
+- **Interfaces**: Registered with SERVER, use CLIENT
+
+### Splunk Instance
+- **Role**: External Splunk deployment
+- **Responsibilities**:
+  - Provide REST API endpoints
+  - Execute SPL queries
+  - Manage data and metadata
+- **Interfaces**: REST API (HTTPS)
+
+## Data Flow
+
+1. MCP Client sends tool invocation request to FastMCP Server
+2. Server routes to appropriate tool module
+3. Tool module uses Client Wrapper to communicate with Splunk
+4. Client Wrapper authenticates via Auth Handler and sends REST API request
+5. Splunk processes request and returns response
+6. Response flows back through Client → Tool → Server → MCP Client
+7. All operations are logged and errors handled appropriately
+
+## Design Patterns
+
+- **Dependency Injection**: Config and auth injected into components
+- **Facade**: Client wrapper simplifies Splunk SDK complexity
+- **Factory**: Tool registration and initialization
+- **Singleton**: Configuration and logger instances
+- **Retry Pattern**: Exponential backoff in client wrapper
+- **Circuit Breaker**: Optional - for Splunk availability issues
