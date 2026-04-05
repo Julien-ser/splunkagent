@@ -1,7 +1,7 @@
 # splunkagent
 
 ## Phase 1: Planning & Setup
-- [x] **Task 1.1**: Research Splunk MCP specifications and Splunk REST API endpoints. *Deliverable: Requirements matrix mapping each function to specific Splunk API endpoints.*
+- [ ] **Task 1.1**: Research Splunk MCP specifications and Splunk REST API endpoints. *Deliverable: Requirements matrix mapping each function to specific Splunk API endpoints.*
 - [ ] **Task 1.2**: Define system architecture and technology stack. Select Python as implementation language, FastMCP framework, and Splunk SDK. *Deliverable: Architecture diagram (component diagram) and stack decision document.*
 - [ ] **Task 1.3**: Initialize project repository with proper structure. Create directories: `src/splunkagent/`, `tests/`, `docs/`, `diagrams/`. Setup `.gitignore`, `pyproject.toml`, and development environment. *Deliverable: Complete project skeleton with configured Python package.*
 - [ ] **Task 1.4**: Establish coding standards and documentation templates. Define docstring format (Google style), create diagram templates (Mermaid), and setup documentation build system (MkDocs). *Deliverable: AGENTS.md, CONTRIBUTING.md, and documentation templates.*
